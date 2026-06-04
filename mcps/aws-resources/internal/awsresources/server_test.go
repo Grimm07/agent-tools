@@ -46,3 +46,26 @@ func TestServerBuilds(t *testing.T) {
 	}
 	_ = listRegisteredTools(t)
 }
+
+// TestServerRegistersAllTools is a registration regression guard: every tool the
+// server promises must be advertised over the transport. Fully offline.
+func TestServerRegistersAllTools(t *testing.T) {
+	got := listRegisteredTools(t)
+	want := []string{
+		"list_profiles", "list_regions",
+		"list_ec2_instances", "list_lambda_functions", "list_ecs_clusters",
+		"list_ecs_services", "list_autoscaling_groups",
+		"list_s3_buckets", "list_ebs_volumes", "list_rds_instances", "list_dynamodb_tables",
+		"list_vpcs", "list_subnets", "list_security_groups", "list_load_balancers", "list_elastic_ips",
+		"list_iam_users", "list_iam_roles", "list_iam_policies",
+		"get_cost_summary",
+	}
+	for _, name := range want {
+		if !got[name] {
+			t.Errorf("tool %q not registered", name)
+		}
+	}
+	if len(got) != len(want) {
+		t.Errorf("registered %d tools, want %d: %v", len(got), len(want), got)
+	}
+}

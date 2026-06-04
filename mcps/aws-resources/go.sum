@@ -16,6 +16,8 @@ github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.28 h1:eaS9vwQ5ym4Y9S6+G/K3d3lgZhx
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.28/go.mod h1:oTdbDr+BMs7gAYrNpD0LDTyqQfv6yOYgTDv46+xbwFY=
 github.com/aws/aws-sdk-go-v2/service/autoscaling v1.67.2 h1:3QZkayCfDIC03Sdvo7xSMmdM/Csd28Ot/GhHhMoHA74=
 github.com/aws/aws-sdk-go-v2/service/autoscaling v1.67.2/go.mod h1:WZZJIhz58ct8LxomV7By8/+kFCRCMQ4BccQhIywHg9A=
+github.com/aws/aws-sdk-go-v2/service/costexplorer v1.64.0 h1:ClMiSW08p6yfyt+7jCw8HcgpZOOy2JqvnEam2B/25Kg=
+github.com/aws/aws-sdk-go-v2/service/costexplorer v1.64.0/go.mod h1:85kM7702IQ99+ZgcC3s5nHdFXC94Bf3MZNv5dyK/W4I=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.8 h1:xM9A74gfqalNsSA7n703Ci2MjlFb0SGbBh6XPqLTcFM=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.8/go.mod h1:qocgqDspSvJmbz213f8tQfU1+F8LJtjmToLuUWeB5eg=
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.305.1 h1:VKg93r3Qt8WuqK9AG1g/pp4fvr7jZ8hP2+ycT3uu8YY=

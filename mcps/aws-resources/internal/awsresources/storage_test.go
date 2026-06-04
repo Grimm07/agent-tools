@@ -157,9 +157,9 @@ func TestListDynamoDBTables(t *testing.T) {
 		listPages: []*dynamodb.ListTablesOutput{{TableNames: []string{"orders"}}},
 		tables: map[string]*dynamodb.DescribeTableOutput{
 			"orders": {Table: &dynamodbtypes.TableDescription{
-				TableName:     aws.String("orders"),
-				TableStatus:   dynamodbtypes.TableStatusActive,
-				ItemCount:     aws.Int64(42),
+				TableName:      aws.String("orders"),
+				TableStatus:    dynamodbtypes.TableStatusActive,
+				ItemCount:      aws.Int64(42),
 				TableSizeBytes: aws.Int64(1024),
 			}},
 		},

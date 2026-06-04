@@ -68,10 +68,10 @@ func TestListECSClusters(t *testing.T) {
 	f := &fakeECSClusters{
 		listPages: []*ecs.ListClustersOutput{{ClusterArns: []string{"arn:aws:ecs:us-east-1:1:cluster/web"}}},
 		desc: &ecs.DescribeClustersOutput{Clusters: []ecstypes.Cluster{{
-			ClusterName:       aws.String("web"),
-			ClusterArn:        aws.String("arn:aws:ecs:us-east-1:1:cluster/web"),
-			Status:            aws.String("ACTIVE"),
-			RunningTasksCount: 3,
+			ClusterName:         aws.String("web"),
+			ClusterArn:          aws.String("arn:aws:ecs:us-east-1:1:cluster/web"),
+			Status:              aws.String("ACTIVE"),
+			RunningTasksCount:   3,
 			ActiveServicesCount: 2,
 		}}},
 	}
