@@ -30,8 +30,9 @@ func NewServer() *mcp.Server {
 
 	cache := newConfigCache()
 	registerHelperTools(s, cache)
-	// Remaining tool groups are registered as their files land (compute,
-	// storage, network, identity, cost).
+	registerComputeTools(s, cache)
+	// Remaining tool groups are registered as their files land (storage,
+	// network, identity, cost).
 	return s
 }
 
