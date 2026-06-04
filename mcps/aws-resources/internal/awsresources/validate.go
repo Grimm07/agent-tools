@@ -1,6 +1,12 @@
 package awsresources
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+// errClusterRequired is returned by tools that need an ECS cluster argument.
+var errClusterRequired = errors.New("cluster is required for this tool (name or ARN)")
 
 // regionRequired returns an error if region is empty. Regional tools call this
 // before any AWS request so a missing region fails fast with a clear message

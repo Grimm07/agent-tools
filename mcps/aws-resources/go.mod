@@ -5,13 +5,17 @@ go 1.25.0
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.11
 	github.com/aws/aws-sdk-go-v2/config v1.32.22
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.67.2
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.305.1
+	github.com/aws/aws-sdk-go-v2/service/ecs v1.82.2
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.92.1
 	github.com/aws/smithy-go v1.27.0
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	gopkg.in/ini.v1 v1.67.2
 )
 
 require (
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.12 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.21 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.27 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.27 // indirect
