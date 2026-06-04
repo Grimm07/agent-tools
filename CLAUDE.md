@@ -9,10 +9,11 @@ workflows: standalone tools, MCP servers, and Claude Code skills. Each unit is s
 independently buildable/testable — there is intentionally no repo-wide build that must run before
 working on a single tool.
 
-> Mostly greenfield. The **go-mcp** and **python-tool** unit kinds have working, verified copier
-> templates (see Scaffolding below) — prefer `make new` over hand-rolling them. Conventions for things
-> without a template yet (skills, libs, infra, CI) are still **prescriptive**; when you add the first
-> real instance, update this file to point at the runnable command.
+> The **go-mcp**, **python-tool**, and **project-mcp** unit kinds have working, verified copier
+> templates (see Scaffolding below) — prefer `make new` over hand-rolling them. Real MCP units live in
+> `mcps/` (`github-account`, `aws-resources`) and are good worked examples of the conventions below.
+> Conventions for things without a template yet (skills, libs, infra, CI) are still **prescriptive**;
+> when you add the first real instance, update this file to point at the runnable command.
 
 ## Scaffolding new units
 
@@ -23,7 +24,15 @@ hand — it keeps every unit at the quality bar and re-templatable:
 ```bash
 make new KIND=go-mcp      NAME="Vector Store"   # -> mcps/vector-store/ (Go MCP server)
 make new KIND=python-tool NAME="Log Parser"      # -> tools/log-parser/  (Python CLI tool)
+make new KIND=project-mcp NAME="My Project"      # -> mcps/my-project/  (Go MCP server scoped to a project)
 ```
+
+The **project-mcp** kind scaffolds a Go MCP server that exposes a project's own commands
+(`run_tests`/`run_lint`/`run_build`), code search/read, docs, and read-only git state. It prompts for
+the project's test/lint/build commands and writes them into a committed `project-mcp.toml` the server
+reads at startup (editable without re-scaffolding). Commands are allowlisted argv (no arbitrary exec),
+and file access is confined to the project root. Pass non-default commands through `make new` with
+`DATA='--data test_command=["go","test","./..."]'`.
 
 `make new` runs copier through `uvx` (no global install) and then runs the unit's setup task
 (`go mod tidy` or `uv sync`), so the new unit is immediately testable. It needs network on first run.
