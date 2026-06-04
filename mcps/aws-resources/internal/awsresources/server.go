@@ -28,8 +28,10 @@ func NewServer() *mcp.Server {
 		Version: version,
 	}, nil)
 
-	// Tool groups are registered as their files land. See the per-category
-	// register* functions (helper/compute/storage/network/identity/cost).
+	cache := newConfigCache()
+	registerHelperTools(s, cache)
+	// Remaining tool groups are registered as their files land (compute,
+	// storage, network, identity, cost).
 	return s
 }
 
