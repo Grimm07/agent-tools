@@ -1,3 +1,23 @@
+{#-
+  Normalize a command answer into a valid TOML argv array.
+
+  Copier answers arrive as a string such as `["go","test","./..."]`. Depending
+  on how the answer was passed (interactive prompt, `--data`, or through the
+  Makefile's shell), the inner double quotes may survive or be stripped (e.g.
+  `[go,test,./...]`). This macro strips the outer brackets, splits on commas,
+  trims whitespace and any surviving quotes from each token, and re-emits a
+  properly double-quoted TOML array — so the rendered config is always valid
+  regardless of quoting along the way.
+-#}
+{%- macro argv_toml(raw) -%}
+{%- set inner = raw | trim -%}
+{%- if inner.startswith('[') %}{% set inner = inner[1:] %}{% endif -%}
+{%- if inner.endswith(']') %}{% set inner = inner[:-1] %}{% endif -%}
+[{% for tok in inner.split(',') %}{%- set t = tok | trim -%}
+{%- if t.startswith('"') and t.endswith('"') %}{% set t = t[1:-1] %}{% elif t.startswith("'") and t.endswith("'") %}{% set t = t[1:-1] %}{% endif -%}
+{%- if t %}"{{ t }}"{% if not loop.last %}, {% endif %}{% endif -%}
+{% endfor %}]
+{%- endmacro -%}
 # Configuration for the {{ name }} project-mcp server.
 #
 # Edit this file to point the server at a project and enable the command tools.
@@ -9,11 +29,11 @@ root = "."
 [commands]
 # Each entry is an argv array (NOT a shell string). Empty/absent = tool disabled.
 # Only these exact argv are ever executed — there is no arbitrary-exec tool.
-{% if test_command %}test = {{ test_command }}{% else %}# test = ["go", "test", "./..."]{% endif %}
+{% if test_command %}test = {{ argv_toml(test_command) }}{% else %}# test = ["go", "test", "./..."]{% endif %}
 
-{% if lint_command %}lint = {{ lint_command }}{% else %}# lint = ["golangci-lint", "run"]{% endif %}
+{% if lint_command %}lint = {{ argv_toml(lint_command) }}{% else %}# lint = ["golangci-lint", "run"]{% endif %}
 
-{% if build_command %}build = {{ build_command }}{% else %}# build = ["go", "build", "./..."]{% endif %}
+{% if build_command %}build = {{ argv_toml(build_command) }}{% else %}# build = ["go", "build", "./..."]{% endif %}
 
 
 [docs]
