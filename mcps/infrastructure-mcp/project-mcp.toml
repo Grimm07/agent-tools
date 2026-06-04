@@ -1,0 +1,19 @@
+# Configuration for the Infrastructure MCP project-mcp server.
+#
+# Edit this file to point the server at a project and enable the command tools.
+# It is read at startup, so changes take effect on the next run — no re-scaffold.
+
+# Project root the server operates within (relative to this config file).
+# Points at the sibling ~/code/infrastructure repo (this instance lives in agent-tools).
+root = "../../../infrastructure"
+
+[commands]
+# Each entry is an argv array (NOT a shell string). Empty/absent = tool disabled.
+# Only these exact argv are ever executed — there is no arbitrary-exec tool.
+test = ["make", "validate"]
+lint = ["tofu", "fmt", "-check", "-recursive"]
+# build = ["go", "build", "./..."]
+
+[docs]
+# Files or directories (under root) exposed via the docs tools.
+paths = ["README.md", "modules", "org"]
