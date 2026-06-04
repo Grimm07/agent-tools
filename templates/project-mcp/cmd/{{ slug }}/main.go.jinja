@@ -1,0 +1,15 @@
+// Command {{ slug }} runs the {{ name }} MCP server over stdio.
+package main
+
+import (
+	"context"
+	"log"
+
+	"github.com/Grimm07/agent-tools/mcps/{{ slug }}/internal/{{ go_pkg }}"
+)
+
+func main() {
+	if err := {{ go_pkg }}.Run(context.Background()); err != nil {
+		log.Fatalf("{{ slug }}: %v", err)
+	}
+}
