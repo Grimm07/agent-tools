@@ -23,6 +23,6 @@ root = "../.."
 
 [docs]
 # Files or directories (under root) exposed via the docs tools. Missing entries
-# are skipped; there is no root README.md, so the docs surface is the repo's
-# guidance (CLAUDE.md) and the scaffolding guide (templates/README.md).
-paths = ["CLAUDE.md", "templates/README.md"]
+# are skipped. The docs surface is the repo's front door (README.md) and rulebook
+# (CLAUDE.md), plus the scaffolding guide (templates/README.md).
+paths = ["README.md", "CLAUDE.md", "templates/README.md"]
