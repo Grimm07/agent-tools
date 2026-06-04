@@ -9,7 +9,7 @@ workflows: standalone tools, MCP servers, and Claude Code skills. Each unit is s
 independently buildable/testable — there is intentionally no repo-wide build that must run before
 working on a single tool.
 
-> The **go-mcp**, **python-tool**, **project-mcp**, and **claude-agent** unit kinds have working,
+> The **go-mcp**, **python-tool**, **project-mcp**, **claude-agent**, and **skill** unit kinds have working,
 > verified copier templates (see Scaffolding below) — prefer `make new` over hand-rolling them. Real MCP units live in
 > `mcps/` (`github-account`, `aws-resources`) and are good worked examples of the conventions below.
 > Conventions for things without a template yet (skills, libs, infra, CI) are still **prescriptive**;
@@ -26,6 +26,7 @@ make new KIND=go-mcp      NAME="Vector Store"   # -> mcps/vector-store/ (Go MCP 
 make new KIND=python-tool NAME="Log Parser"      # -> tools/log-parser/  (Python CLI tool)
 make new KIND=project-mcp NAME="My Project"      # -> mcps/my-project/  (Go MCP server scoped to a project)
 make new KIND=claude-agent NAME="Repo Auditor"   # -> .claude/agents/repo-auditor.md (Claude Code subagent)
+make new KIND=skill        NAME="Flaky Finder"   # -> skills/flaky-finder/SKILL.md (Claude Code skill)
 ```
 
 The **project-mcp** kind scaffolds a Go MCP server that exposes a project's own commands
@@ -94,8 +95,13 @@ Every unit (`tools/*`, `mcps/*`, `libs/*`) is independently runnable and carries
   layout (`src/<module>/`). Logic lives in `core.py`, free of argparse, so it tests offline; `cli.py`
   is a thin shell. `make test` → `uv run pytest`; `make lint` → `ruff check` + `mypy` (strict). Prefer
   the stdlib and a small, justified dependency set.
-- **Skills** (no template yet): a `SKILL.md` with YAML frontmatter (`name`, `description`) plus any
-  scripts/references it needs. The `description` is what triggers the skill — make it specific.
+- **Skills** (`make new KIND=skill`): a `skills/<slug>/SKILL.md` with YAML frontmatter (`name`,
+  `description`) plus any scripts/references it needs. The `description` is the only text Claude reads
+  to decide whether to load the skill, so it must list *triggering conditions* ("Use when…") and must
+  **not** summarize the workflow — a process-summary description makes Claude act on the summary and
+  skip the body. The scaffold renders the recommended section skeleton with fill-in guidance comments;
+  it has no `Makefile`/`make test` (a skill is Markdown), so it's the one unit kind exempt from the
+  per-unit `Makefile` rule above.
 
 CI is not wired yet: GitHub only runs workflows from the repo-root `.github/workflows/`, so per-unit CI
 needs a path-filtered root workflow — design that when the first unit needs it, mirroring the unit's

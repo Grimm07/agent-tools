@@ -1,0 +1,59 @@
+---
+name: {{ slug }}
+description: {{ skill_description }}
+---
+
+# {{ name }}
+
+<!--
+  This is a Claude Code skill. The frontmatter above is the only part Claude sees
+  when deciding whether to load you, so it carries all the weight:
+
+  - name:        letters, numbers, hyphens only. Active voice / verb-first reads
+                 best ({{ slug }} is fine; prefer e.g. `condition-based-waiting`
+                 over `async-helpers`).
+  - description: triggering conditions ONLY — *when* to use this, never *what* it
+                 does. Start with "Use when…", name concrete symptoms/contexts,
+                 and do NOT summarize the workflow below. A description that
+                 describes the process tempts Claude to act on it and skip the
+                 body entirely.
+
+  Delete these comments as you fill the skill in. Keep the body tight (aim < 500
+  words); move anything 100+ lines (API dumps, big references) into a sibling
+  file and link to it instead of inlining.
+-->
+
+## Overview
+
+<!-- What is this and the core principle in 1-2 sentences. Replace this. -->
+
+## When to Use
+
+<!-- Bullet the SYMPTOMS and situations that should pull this skill in. Use the
+     words someone would actually search for (error strings, failure modes). -->
+
+- <!-- e.g. "…when X keeps happening" -->
+
+**When NOT to use:** <!-- the adjacent cases this skill should *not* claim. -->
+
+## Quick Reference
+
+<!-- A scannable table or bullet list of the common operations/decisions. This is
+     what a reader lands on first, so make it answer 80% of cases. -->
+
+| Situation | Do this |
+|-----------|---------|
+|           |         |
+
+## How It Works
+
+<!-- The actual technique/pattern/reference. One excellent, runnable example beats
+     five mediocre ones — don't reimplement across languages. Inline code under
+     ~50 lines; otherwise link a sibling file (e.g. `./reference.md`). -->
+
+## Common Mistakes
+
+<!-- What goes wrong in practice and the fix. Pull these from real failures, not
+     hypotheticals. -->
+
+- <!-- mistake → fix -->

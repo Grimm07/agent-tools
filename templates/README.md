@@ -14,6 +14,7 @@ make new KIND=go-mcp       NAME="Vector Store"   # -> mcps/vector-store/
 make new KIND=python-tool  NAME="Log Parser"     # -> tools/log-parser/
 make new KIND=project-mcp  NAME="My Project"     # -> mcps/my-project/
 make new KIND=claude-agent NAME="Repo Auditor"   # -> .claude/agents/repo-auditor.md
+make new KIND=skill        NAME="Flaky Finder"   # -> skills/flaky-finder/SKILL.md
 ```
 
 `make new` runs copier ephemerally through `uvx` (nothing to install globally) with `--trust`
@@ -103,6 +104,31 @@ make new KIND=claude-agent NAME="Repo Auditor" \
 Then edit the body — it becomes the agent's system prompt. Because the output lives in `.claude/`,
 `copier update` does not apply to agent files; regenerate or edit by hand.
 
+## The `skill` kind
+
+`skill` scaffolds a [Claude Code skill](https://docs.claude.com/en/docs/claude-code/skills) into
+`skills/<slug>/SKILL.md` — YAML frontmatter (`name`, `description`) plus a body pre-structured into the
+sections a good skill needs (Overview, When to Use, Quick Reference, How It Works, Common Mistakes),
+each with fill-in guidance comments. Like the MCP/tool kinds it renders a *directory* and commits a
+`.copier-answers.yml`, so `copier update` rolls later template improvements in. There are no `_tasks`
+(a skill is Markdown — nothing to install or build).
+
+One optional question (asked only when `kind == skill`) drives the frontmatter:
+
+| Question | Meaning |
+|----------|---------|
+| `skill_description` | the `description` Claude triggers on; defaults to `Use when {{ '{{ description }}' }}` |
+
+The `description` is load-bearing: it is the **only** text Claude reads when deciding whether to pull
+the skill in, so it must list *triggering conditions* ("Use when…") and must **not** summarize the
+workflow — a description that describes the process tempts Claude to act on it and skip the body. The
+scaffold's inline comments spell this out; delete them as you fill the skill in.
+
+```bash
+make new KIND=skill NAME="Flaky Finder" \
+  DATA='--data skill_description=Use when tests pass and fail without code changes'
+```
+
 ## Updating existing units
 
 Each generated unit commits a `.copier-answers.yml`. To roll template improvements into it:
@@ -123,7 +149,8 @@ templates/
 ├── go-mcp/             # rendered when kind == go-mcp
 ├── python-tool/        # rendered when kind == python-tool
 ├── project-mcp/        # rendered when kind == project-mcp
-└── claude-agent/       # rendered when kind == claude-agent ({{ slug }}.md.jinja)
+├── claude-agent/       # rendered when kind == claude-agent ({{ slug }}.md.jinja)
+└── skill/              # rendered when kind == skill (-> skills/<slug>/SKILL.md)
 ```
 
 ## Adding a new kind

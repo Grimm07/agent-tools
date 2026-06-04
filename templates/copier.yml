@@ -13,6 +13,9 @@ _message_after_copy: |
   {% if kind == 'claude-agent' %}
   Created claude-agent "{{ name }}" ({{ slug }}.md). Fill in the system-prompt body;
   it is then available as a subagent in .claude/agents/.
+  {% elif kind == 'skill' %}
+  Created skill "{{ name }}" (skills/{{ slug }}/SKILL.md). Fill in the body and
+  tighten the `description` to triggering conditions only ("Use when…").
   {% else %}
   Created {{ kind }} unit "{{ name }}" ({{ slug }}).
   Next:
@@ -28,6 +31,7 @@ kind:
     - python-tool
     - project-mcp
     - claude-agent
+    - skill
 
 name:
   type: str
@@ -99,6 +103,21 @@ agent_model:
     - opus
     - haiku
   when: "{{ kind == 'claude-agent' }}"
+
+# ---- skill fields (only asked for the skill kind) ----
+# Rendered into SKILL.md's YAML frontmatter at skills/<slug>/SKILL.md. The
+# `description` is the ONLY thing Claude reads to decide whether to load the
+# skill, so it must be triggering conditions ("Use when…"), not a workflow
+# summary — see the comments in the scaffolded SKILL.md.
+skill_description:
+  type: str
+  help: >-
+    When should this skill trigger? Becomes the `description`. Start with "Use when…"
+    and list concrete symptoms/contexts only — do NOT summarize the workflow.
+  default: "Use when {{ description }}"
+  when: "{{ kind == 'skill' }}"
+  validator: >-
+    {% if kind == 'skill' and not skill_description.strip() %}skill_description must not be empty{% endif %}
 
 # ---- Derived identifiers (computed, never prompted: `when: false`) ----
 # slug:      kebab-case, used for dirs, binary/script name, module/dist name.
