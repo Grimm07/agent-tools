@@ -10,10 +10,15 @@ _envops:
   lstrip_blocks: true
 
 _message_after_copy: |
+  {% if kind == 'claude-agent' %}
+  Created claude-agent "{{ name }}" ({{ slug }}.md). Fill in the system-prompt body;
+  it is then available as a subagent in .claude/agents/.
+  {% else %}
   Created {{ kind }} unit "{{ name }}" ({{ slug }}).
   Next:
     cd {{ _copier_conf.dst_path }}
     make test
+  {% endif %}
 
 kind:
   type: str
@@ -22,6 +27,7 @@ kind:
     - go-mcp
     - python-tool
     - project-mcp
+    - claude-agent
 
 name:
   type: str
@@ -68,6 +74,31 @@ build_command:
   when: "{{ kind == 'project-mcp' }}"
   validator: >-
     {% if kind == 'project-mcp' and build_command and not (build_command.strip().startswith('[') and build_command.strip().endswith(']')) %}build_command must be a TOML array like ["go","build","./..."]{% endif %}
+
+# ---- claude-agent fields (only asked for the claude-agent kind) ----
+# Rendered into the subagent's YAML frontmatter at .claude/agents/<slug>.md.
+agent_description:
+  type: str
+  help: "When should Claude delegate to this agent? (becomes the `description` it triggers on)"
+  default: "{{ description }}"
+  when: "{{ kind == 'claude-agent' }}"
+
+agent_tools:
+  type: str
+  help: "Tools the agent may use, comma-separated (e.g. 'Read, Grep, Glob, Bash'); or 'inherit' for all"
+  default: "Read, Grep, Glob, Bash"
+  when: "{{ kind == 'claude-agent' }}"
+
+agent_model:
+  type: str
+  help: "Model for this agent"
+  default: inherit
+  choices:
+    - inherit
+    - sonnet
+    - opus
+    - haiku
+  when: "{{ kind == 'claude-agent' }}"
 
 # ---- Derived identifiers (computed, never prompted: `when: false`) ----
 # slug:      kebab-case, used for dirs, binary/script name, module/dist name.

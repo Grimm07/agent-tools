@@ -9,8 +9,8 @@ workflows: standalone tools, MCP servers, and Claude Code skills. Each unit is s
 independently buildable/testable — there is intentionally no repo-wide build that must run before
 working on a single tool.
 
-> The **go-mcp**, **python-tool**, and **project-mcp** unit kinds have working, verified copier
-> templates (see Scaffolding below) — prefer `make new` over hand-rolling them. Real MCP units live in
+> The **go-mcp**, **python-tool**, **project-mcp**, and **claude-agent** unit kinds have working,
+> verified copier templates (see Scaffolding below) — prefer `make new` over hand-rolling them. Real MCP units live in
 > `mcps/` (`github-account`, `aws-resources`) and are good worked examples of the conventions below.
 > Conventions for things without a template yet (skills, libs, infra, CI) are still **prescriptive**;
 > when you add the first real instance, update this file to point at the runnable command.
@@ -25,6 +25,7 @@ hand — it keeps every unit at the quality bar and re-templatable:
 make new KIND=go-mcp      NAME="Vector Store"   # -> mcps/vector-store/ (Go MCP server)
 make new KIND=python-tool NAME="Log Parser"      # -> tools/log-parser/  (Python CLI tool)
 make new KIND=project-mcp NAME="My Project"      # -> mcps/my-project/  (Go MCP server scoped to a project)
+make new KIND=claude-agent NAME="Repo Auditor"   # -> .claude/agents/repo-auditor.md (Claude Code subagent)
 ```
 
 The **project-mcp** kind scaffolds a Go MCP server that exposes a project's own commands

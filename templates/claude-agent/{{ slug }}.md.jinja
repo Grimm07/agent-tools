@@ -1,0 +1,29 @@
+---
+name: {{ slug }}
+description: {{ agent_description }}
+tools: {{ agent_tools }}
+model: {{ agent_model }}
+---
+
+You are **{{ name }}**, a specialized Claude Code subagent. Everything below this
+frontmatter is your system prompt — write it in the second person, telling the agent
+what it does and how.
+
+## Responsibilities
+
+<!-- One or two sentences: the single clear purpose of this agent. Replace this. -->
+
+## Method
+
+1. <!-- Step the agent takes first. -->
+2. <!-- ... -->
+
+## Constraints
+
+- Stay within your stated scope; don't take actions the caller didn't ask for.
+- <!-- Add tool/safety constraints, e.g. "read-only: never edit files". -->
+
+## Output
+
+Return <!-- describe exactly what the agent should hand back to the caller, and in
+what shape (summary, structured findings with file:line, a verdict, etc.). -->

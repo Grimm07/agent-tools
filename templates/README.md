@@ -2,16 +2,18 @@
 
 A single [copier](https://copier.readthedocs.io/) template that scaffolds new repo units. The `kind`
 answer selects which project tree is rendered (via a Jinja-templated `_subdirectory`), so one shared
-questionnaire produces a Go MCP server, a Python tool, or a project-scoped MCP server.
+questionnaire produces a Go MCP server, a Python tool, a project-scoped MCP server, or a Claude Code
+subagent definition.
 
 ## Usage
 
 From the repo root:
 
 ```bash
-make new KIND=go-mcp      NAME="Vector Store"   # -> mcps/vector-store/
-make new KIND=python-tool NAME="Log Parser"     # -> tools/log-parser/
-make new KIND=project-mcp NAME="My Project"     # -> mcps/my-project/
+make new KIND=go-mcp       NAME="Vector Store"   # -> mcps/vector-store/
+make new KIND=python-tool  NAME="Log Parser"     # -> tools/log-parser/
+make new KIND=project-mcp  NAME="My Project"     # -> mcps/my-project/
+make new KIND=claude-agent NAME="Repo Auditor"   # -> .claude/agents/repo-auditor.md
 ```
 
 `make new` runs copier ephemerally through `uvx` (nothing to install globally) with `--trust`
@@ -77,6 +79,30 @@ uvx --from 'copier>=9,<10' copier copy --trust --defaults \
 Edit `project-mcp.toml` afterward to enable/adjust commands or the exposed `docs.paths`; changes take
 effect on the next run with no re-scaffold.
 
+## The `claude-agent` kind
+
+`claude-agent` scaffolds a single [Claude Code subagent](https://docs.claude.com/en/docs/claude-code/sub-agents)
+definition at `.claude/agents/<slug>.md` — YAML frontmatter (`name`, `description`, `tools`, `model`)
+plus a system-prompt body to fill in. Unlike the other kinds it produces one file, not a unit
+directory, so `make new` renders it via a temp dir and moves only the `.md` into place (no
+`.copier-answers.yml` is left in `.claude/agents/`, and no `_tasks` run).
+
+Three optional questions (asked only when `kind == claude-agent`) drive the frontmatter:
+
+| Question | Meaning |
+|----------|---------|
+| `agent_description` | when Claude should delegate to the agent (defaults to `description`) |
+| `agent_tools` | comma-separated tool allowlist, e.g. `Read, Grep, Glob, Bash`; or `inherit` for all |
+| `agent_model` | `inherit` (default), `sonnet`, `opus`, or `haiku` |
+
+```bash
+make new KIND=claude-agent NAME="Repo Auditor" \
+  DATA='--data agent_tools=Read,Grep,Glob --data agent_model=sonnet'
+```
+
+Then edit the body — it becomes the agent's system prompt. Because the output lives in `.claude/`,
+`copier update` does not apply to agent files; regenerate or edit by hand.
+
 ## Updating existing units
 
 Each generated unit commits a `.copier-answers.yml`. To roll template improvements into it:
@@ -96,7 +122,8 @@ templates/
 ├── copier.yml          # shared questionnaire, _subdirectory, _tasks
 ├── go-mcp/             # rendered when kind == go-mcp
 ├── python-tool/        # rendered when kind == python-tool
-└── project-mcp/        # rendered when kind == project-mcp
+├── project-mcp/        # rendered when kind == project-mcp
+└── claude-agent/       # rendered when kind == claude-agent ({{ slug }}.md.jinja)
 ```
 
 ## Adding a new kind
@@ -104,6 +131,8 @@ templates/
 1. Create `templates/<new-kind>/` with the project tree; suffix templated files with `.jinja` and use
    `{{ slug }}` / `{{ go_pkg }}` / `{{ py_module }}` in file contents and path names.
 2. Add a `{{ _copier_conf.answers_file }}.jinja` at its root (body: `{{ '{{' }} _copier_answers | to_nice_yaml {{ '}}' }}`).
-3. Add the kind to the `kind` choices in `copier.yml` (and any new `_tasks`).
-4. Map it to an output directory in the root `Makefile` `new` target.
+3. Add the kind to the `kind` choices in `copier.yml` (and any new `_tasks` / gated questions).
+4. Map it to an output directory in the root `Makefile` `new` target. A kind that emits a **single
+   file** (like `claude-agent`) instead of a directory needs the temp-dir-then-move handling the
+   `claude-agent` branch uses, so copier's answers file isn't left beside the output.
 ```
