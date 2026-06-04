@@ -25,6 +25,9 @@ crash.log
 .env.*
 *.pem
 
+# Claude Code local-only notes
+.claude.local.md
+
 # Editors (JetBrains, VS Code/Cursor)
 .idea/
 .vscode/

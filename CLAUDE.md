@@ -41,6 +41,12 @@ Each unit commits a `.copier-answers.yml`; to pull later template improvements i
 `cd <unit> && copier update --trust`. To add a new kind or change what gets generated, edit
 `templates/` — see `templates/README.md`.
 
+- Adding a `kind` means editing **both** `templates/copier.yml` (choices + gated questions) **and** the
+  `Makefile` `new` target's `case "$(KIND)"` dest mapping — they are not auto-synced.
+- Pass non-default copier answers via `make new ... DATA='--data key=value'`; `make` strips inner quotes
+  from array answers (`["a","b"]`→`[a,b]`), so templates consuming argv arrays must re-normalize them.
+- Scaffolding generates `cmd/<slug>/` with the hyphenated slug (e.g. `cmd/aws-resources/`), not de-hyphenated.
+
 ## Layout
 
 | Path | Holds |
@@ -78,6 +84,11 @@ Every unit (`tools/*`, `mcps/*`, `libs/*`) is independently runnable and carries
   `*_test.go` alongside code. `make test` → `go test -race ./...`; `make lint` → `gofmt -l` check +
   `go vet` + `staticcheck` (skipped with a hint if not installed). Tool handlers are kept as plain
   functions so they unit-test directly; full dispatch is tested via `mcp.NewInMemoryTransports()`.
+  For servers wrapping an external API, inject the client so handlers test offline: REST clients
+  (e.g. `go-github`) via an `httptest.Server` with `client.BaseURL` overridden; `aws-sdk-go-v2` via the
+  SDK's own `*APIClient` paginator interfaces with fake implementations (never live calls). For
+  read-only servers, import only `Get/List/Describe` methods and guard with
+  `grep -E '(Create|Delete|Put|Update|Modify|Terminate)[A-Z]' internal/` (filter the benign `CreateDate` field).
 - **Python tool** (`make new KIND=python-tool`): `pyproject.toml` per package, **uv**-managed, src
   layout (`src/<module>/`). Logic lives in `core.py`, free of argparse, so it tests offline; `cli.py`
   is a thin shell. `make test` → `uv run pytest`; `make lint` → `ruff check` + `mypy` (strict). Prefer
