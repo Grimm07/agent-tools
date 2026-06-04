@@ -21,6 +21,7 @@ kind:
   choices:
     - go-mcp
     - python-tool
+    - project-mcp
 
 name:
   type: str
@@ -39,6 +40,34 @@ author_name:
 author_email:
   type: str
   default: trystan.tbm@gmail.com
+
+# ---- project-mcp command allowlist (only asked for the project-mcp kind) ----
+# Each answer is a TOML argv array written verbatim into project-mcp.toml's
+# [commands] table (the server execs argv directly, never via a shell). An empty
+# answer leaves that command tool disabled (commented out in the config).
+test_command:
+  type: str
+  help: 'Test command as a TOML array, e.g. ["go","test","./..."] (empty to disable)'
+  default: ""
+  when: "{{ kind == 'project-mcp' }}"
+  validator: >-
+    {% if kind == 'project-mcp' and test_command and not (test_command.strip().startswith('[') and test_command.strip().endswith(']')) %}test_command must be a TOML array like ["go","test","./..."]{% endif %}
+
+lint_command:
+  type: str
+  help: 'Lint command as a TOML array, e.g. ["golangci-lint","run"] (empty to disable)'
+  default: ""
+  when: "{{ kind == 'project-mcp' }}"
+  validator: >-
+    {% if kind == 'project-mcp' and lint_command and not (lint_command.strip().startswith('[') and lint_command.strip().endswith(']')) %}lint_command must be a TOML array like ["golangci-lint","run"]{% endif %}
+
+build_command:
+  type: str
+  help: 'Build command as a TOML array, e.g. ["go","build","./..."] (empty to disable)'
+  default: ""
+  when: "{{ kind == 'project-mcp' }}"
+  validator: >-
+    {% if kind == 'project-mcp' and build_command and not (build_command.strip().startswith('[') and build_command.strip().endswith(']')) %}build_command must be a TOML array like ["go","build","./..."]{% endif %}
 
 # ---- Derived identifiers (computed, never prompted: `when: false`) ----
 # slug:      kebab-case, used for dirs, binary/script name, module/dist name.
@@ -64,5 +93,7 @@ py_module:
 _tasks:
   - command: ["go", "mod", "tidy"]
     when: "{{ kind == 'go-mcp' }}"
+  - command: ["go", "mod", "tidy"]
+    when: "{{ kind == 'project-mcp' }}"
   - command: ["uv", "sync"]
     when: "{{ kind == 'python-tool' }}"
