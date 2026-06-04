@@ -1,0 +1,20 @@
+import pytest
+
+from {{ py_module }}.cli import create_parser, main
+
+
+def test_parser_reads_name() -> None:
+    args = create_parser().parse_args(["Ada"])
+    assert args.name == "Ada"
+
+
+def test_main_prints_greeting(capsys: pytest.CaptureFixture[str]) -> None:
+    code = main(["Ada"])
+    assert code == 0
+    assert capsys.readouterr().out.strip() == "Hello, Ada!"
+
+
+def test_main_errors_on_empty(capsys: pytest.CaptureFixture[str]) -> None:
+    code = main(["   "])
+    assert code == 2
+    assert "error:" in capsys.readouterr().err

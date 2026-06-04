@@ -1,0 +1,25 @@
+# {{ name }} — Python tool. Run these targets from this unit's directory.
+.PHONY: help sync test lint fmt typecheck run
+
+help: ## List targets
+	@grep -hE '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*##"}{printf "  \033[36m%-9s\033[0m %s\n", $$1, $$2}'
+
+sync: ## Create the venv and install deps (incl. dev group)
+	uv sync
+
+test: ## Run the test suite
+	uv run pytest
+
+lint: ## Lint (ruff) and type-check (mypy) — non-mutating
+	uv run ruff check .
+	uv run mypy src
+
+fmt: ## Auto-format and apply safe lint fixes
+	uv run ruff format .
+	uv run ruff check --fix .
+
+typecheck: ## Type-check only
+	uv run mypy src
+
+run: ## Run the CLI, e.g. make run ARGS="Ada"
+	uv run {{ slug }} $(ARGS)

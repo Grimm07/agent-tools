@@ -1,0 +1,40 @@
+# {{ name }}
+
+{{ description }}
+
+**Language: Python.** A standalone CLI tool managed with [uv](https://docs.astral.sh/uv/). Python is
+the repo default for tools that aren't a better fit for Go (see the root `CLAUDE.md`).
+
+## Requirements
+
+- [uv](https://docs.astral.sh/uv/) (it manages the Python version and virtualenv).
+
+## Commands
+
+```bash
+make sync       # uv sync — create .venv and install deps
+make test       # uv run pytest
+make lint       # ruff check + mypy (strict)
+make fmt        # ruff format + ruff --fix
+make run ARGS="Ada"
+```
+
+Or invoke the installed console script directly: `uv run {{ slug }} Ada`.
+
+## Layout
+
+```
+src/{{ py_module }}/core.py        # pure logic — no argparse, the testable surface
+src/{{ py_module }}/cli.py         # create_parser() + main(argv); wires logic to the CLI
+src/{{ py_module }}/__main__.py    # `python -m {{ py_module }}`
+tests/test_core.py / test_cli.py  # logic tests + parser/main tests
+```
+
+Logic lives in `core.py` and the CLI is a thin shell over it, so the bulk of behavior is tested
+offline without touching argv or subprocesses.
+
+## Updating from the template
+
+```bash
+copier update --trust   # pulls template improvements; answers are in .copier-answers.yml
+```

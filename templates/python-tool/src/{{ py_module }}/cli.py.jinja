@@ -1,0 +1,40 @@
+"""Command-line interface for {{ name }}.
+
+Parsing is isolated from logic: `create_parser` builds the parser, `main` wires
+it to `core`. Both are importable and testable without spawning a subprocess.
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from collections.abc import Sequence
+
+from {{ py_module }} import __version__
+from {{ py_module }}.core import greet
+
+
+def create_parser() -> argparse.ArgumentParser:
+    """Build the argument parser. Separate so it can be tested in isolation."""
+    parser = argparse.ArgumentParser(prog="{{ slug }}", description="{{ description }}")
+    parser.add_argument("name", help="name to greet")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Entry point. Returns a process exit code.
+
+    *argv* defaults to ``sys.argv[1:]``; pass a list in tests.
+    """
+    args = create_parser().parse_args(argv)
+    try:
+        print(greet(args.name))
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,19 @@
+"""Core logic for {{ name }}.
+
+Kept free of CLI/argparse concerns so it can be unit-tested directly and reused
+as a library. This is where real functionality lives.
+"""
+
+from __future__ import annotations
+
+
+def greet(name: str) -> str:
+    """Return a friendly greeting for *name*.
+
+    Raises:
+        ValueError: if *name* is empty or only whitespace.
+    """
+    cleaned = name.strip()
+    if not cleaned:
+        raise ValueError("name must not be empty")
+    return f"Hello, {cleaned}!"

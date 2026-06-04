@@ -1,0 +1,31 @@
+# Go
+*.exe
+*.test
+*.out
+/bin/
+
+# Python / uv
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# OpenTofu / Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# Secrets / env
+.env
+.env.*
+*.pem
+
+# Editors (JetBrains, VS Code/Cursor)
+.idea/
+.vscode/
+*.iml

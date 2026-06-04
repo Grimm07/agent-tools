@@ -1,0 +1,68 @@
+# Copier template for agent-tools units.
+#
+# One template, switched by `kind`. `_subdirectory` resolves to the chosen
+# kind's folder, so only that project tree is rendered. See templates/README.md.
+_min_copier_version: "9.0.0"
+_subdirectory: "{{ kind }}"
+_answers_file: ".copier-answers.yml"
+_envops:
+  trim_blocks: true
+  lstrip_blocks: true
+
+_message_after_copy: |
+  Created {{ kind }} unit "{{ name }}" ({{ slug }}).
+  Next:
+    cd {{ _copier_conf.dst_path }}
+    make test
+
+kind:
+  type: str
+  help: What kind of unit to scaffold?
+  choices:
+    - go-mcp
+    - python-tool
+
+name:
+  type: str
+  help: 'Human-readable name, e.g. "Vector Store"'
+  validator: "{% if not name.strip() %}name must not be empty{% endif %}"
+
+description:
+  type: str
+  help: One-line description of the unit
+  default: "A {{ kind }} unit."
+
+author_name:
+  type: str
+  default: Grimm07
+
+author_email:
+  type: str
+  default: trystan.tbm@gmail.com
+
+# ---- Derived identifiers (computed, never prompted: `when: false`) ----
+# slug:      kebab-case, used for dirs, binary/script name, module/dist name.
+# go_pkg:    a valid Go package identifier (letters/digits only).
+# py_module: a valid Python module identifier (snake_case).
+slug:
+  type: str
+  default: "{{ name | lower | replace(' ', '-') | replace('_', '-') }}"
+  when: false
+
+go_pkg:
+  type: str
+  default: "{{ slug | replace('-', '') }}"
+  when: false
+
+py_module:
+  type: str
+  default: "{{ slug | replace('-', '_') }}"
+  when: false
+
+# Post-generation setup. Gated behind `copier copy --trust`.
+# (No `git init` on purpose: units stay part of the agent-tools monorepo.)
+_tasks:
+  - command: ["go", "mod", "tidy"]
+    when: "{{ kind == 'go-mcp' }}"
+  - command: ["uv", "sync"]
+    when: "{{ kind == 'python-tool' }}"
