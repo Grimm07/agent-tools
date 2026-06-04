@@ -2,39 +2,28 @@ package githubaccount
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-// TestGreet exercises the handler directly — no transport, fully offline.
-func TestGreet(t *testing.T) {
-	res, out, err := Greet(context.Background(), nil, GreetInput{Name: "Ada"})
-	if err != nil {
-		t.Fatalf("Greet returned error: %v", err)
-	}
-	if out.Message != "Hello, Ada!" {
-		t.Errorf("Message = %q, want %q", out.Message, "Hello, Ada!")
-	}
-	if len(res.Content) != 1 {
-		t.Fatalf("len(Content) = %d, want 1", len(res.Content))
-	}
-	text, ok := res.Content[0].(*mcp.TextContent)
-	if !ok {
-		t.Fatalf("Content[0] is %T, want *mcp.TextContent", res.Content[0])
-	}
-	if text.Text != "Hello, Ada!" {
-		t.Errorf("Text = %q, want %q", text.Text, "Hello, Ada!")
-	}
-}
+// TestListReposOverTransport wires a client and server through in-memory
+// transports, exercising tool registration + dispatch without stdio. The
+// GitHub client is pointed at an httptest server, so it stays fully offline.
+func TestListReposOverTransport(t *testing.T) {
+	ghSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`[{"name":"app","full_name":"me/app","private":true,
+			"description":"d","default_branch":"main","html_url":"u"}]`))
+	}))
+	defer ghSrv.Close()
 
-// TestGreetOverTransport wires a client and server through in-memory transports,
-// exercising registration + dispatch without stdio. Still fully offline.
-func TestGreetOverTransport(t *testing.T) {
 	ctx := context.Background()
 	clientT, serverT := mcp.NewInMemoryTransports()
 
-	serverSession, err := NewServer().Connect(ctx, serverT, nil)
+	gh := newClient("t", ghSrv.URL+"/")
+	serverSession, err := newServerWithClient(gh).Connect(ctx, serverT, nil)
 	if err != nil {
 		t.Fatalf("server connect: %v", err)
 	}
@@ -48,20 +37,16 @@ func TestGreetOverTransport(t *testing.T) {
 	defer clientSession.Close()
 
 	res, err := clientSession.CallTool(ctx, &mcp.CallToolParams{
-		Name:      "greet",
-		Arguments: map[string]any{"name": "Ada"},
+		Name:      "list_repos",
+		Arguments: map[string]any{"per_page": 30},
 	})
 	if err != nil {
 		t.Fatalf("CallTool: %v", err)
 	}
 	if res.IsError {
-		t.Fatal("CallTool returned IsError")
+		t.Fatalf("CallTool returned IsError: %+v", res.Content)
 	}
-	text, ok := res.Content[0].(*mcp.TextContent)
-	if !ok {
-		t.Fatalf("Content[0] is %T, want *mcp.TextContent", res.Content[0])
-	}
-	if text.Text != "Hello, Ada!" {
-		t.Errorf("Text = %q, want %q", text.Text, "Hello, Ada!")
+	if len(res.Content) == 0 {
+		t.Fatal("expected content")
 	}
 }
